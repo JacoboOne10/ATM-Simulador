@@ -4,7 +4,6 @@ import database as db
 
 def login_screen(page: ft.Page):
     # --- CONFIGURACIÓN DE PÁGINA ---
-    # Regresamos a la configuración básica que tenías al principio
     page.window_maximized = True
     page.bgcolor = ft.Colors.BLACK
     page.title = "Simulador ATM - Login"
@@ -12,7 +11,7 @@ def login_screen(page: ft.Page):
     page.padding = 0
     page.margin = 0
 
-    # --- ESTILO PARA EL BOTÓN (Todo Negro y Blanco) ---
+    # --- ESTILO PARA EL BOTÓN
     estilo_comun = ft.ButtonStyle(
         bgcolor=ft.Colors.BLACK,
         color=ft.Colors.WHITE,
@@ -27,9 +26,9 @@ def login_screen(page: ft.Page):
             border_radius=10,
             clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
             shadow=ft.BoxShadow(
-                spread_radius=2,
-                blur_radius=15,
-                color=ft.Colors.with_opacity(0.3, ft.Colors.WHITE),
+                spread_radius=3,      # grosor
+                blur_radius=10,       # que se difumine más suave
+                color=ft.Colors.with_opacity(0.65, ft.Colors.WHITE), # que sea más blanco
                 offset=ft.Offset(0, 0),
             ),
         )
