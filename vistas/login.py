@@ -2,127 +2,150 @@ import flet as ft
 import database as db
 
 
-def login_screen(page: ft.Page):
-    # --- CONFIGURACIÓN DE PÁGINA ---
-    page.window_maximized = True
-    page.bgcolor = ft.Colors.BLACK
-    page.title = "Simulador ATM - Login"
-    page.theme_mode = ft.ThemeMode.DARK
-    page.padding = 0
-    page.margin = 0
+def obtener_vista_login(page: ft.Page, al_ingresar):
 
-    # --- ESTILO PARA EL BOTÓN
-    estilo_comun = ft.ButtonStyle(
-        bgcolor=ft.Colors.BLACK,
-        color=ft.Colors.WHITE,
-        shape=ft.RoundedRectangleBorder(radius=10),
-        side=ft.BorderSide(width=0, color=ft.Colors.TRANSPARENT),
-    )
-
-    # --- FUNCIÓN PARA LA SOMBRA PERIMETRAL (GLOW) ---
-    def aplicar_sombra_perimetral(control):
-        return ft.Container(
-            content=control,
-            border_radius=10,
-            clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
-            shadow=ft.BoxShadow(
-                spread_radius=3,      # grosor
-                blur_radius=10,       # que se difumine más suave
-                color=ft.Colors.with_opacity(0.65, ft.Colors.WHITE), # que sea más blanco
-                offset=ft.Offset(0, 0),
-            ),
-        )
-
-    # --- CAMPOS DE ENTRADA (Hint Text - Se quita al clic) ---
     cuenta_input = ft.TextField(
-        hint_text="Número de Cuenta",
-        hint_style=ft.TextStyle(color=ft.Colors.WHITE70),
-        border_color=ft.Colors.TRANSPARENT,
-        focused_border_color=ft.Colors.TRANSPARENT,
-        bgcolor=ft.Colors.BLACK,
+        border_color=ft.Colors.WHITE38,
+        focused_border_color=ft.Colors.WHITE,
         color=ft.Colors.WHITE,
         cursor_color=ft.Colors.WHITE,
-        width=400,
-        text_align=ft.TextAlign.CENTER,
+        text_align=ft.TextAlign.LEFT,
         max_length=8,
         counter=ft.Container(),
         input_filter=ft.NumbersOnlyInputFilter(),
         border_radius=10,
+        bgcolor=ft.Colors.TRANSPARENT,
     )
 
     nip_input = ft.TextField(
-        hint_text="NIP",
-        hint_style=ft.TextStyle(color=ft.Colors.WHITE70),
-        border_color=ft.Colors.TRANSPARENT,
-        focused_border_color=ft.Colors.TRANSPARENT,
-        bgcolor=ft.Colors.BLACK,
+        border_color=ft.Colors.WHITE38,
+        focused_border_color=ft.Colors.WHITE,
         color=ft.Colors.WHITE,
         cursor_color=ft.Colors.WHITE,
         password=True,
         can_reveal_password=True,
-        width=400,
-        text_align=ft.TextAlign.CENTER,
+        text_align=ft.TextAlign.LEFT,
         max_length=4,
         counter=ft.Container(),
         input_filter=ft.NumbersOnlyInputFilter(),
         border_radius=10,
+        bgcolor=ft.Colors.TRANSPARENT,
     )
 
-    error_msg = ft.Text("Credenciales incorrectas", color="red", visible=False, size=18)
+    error_msg = ft.Text(
+        "Credenciales incorrectas",
+        color=ft.Colors.RED_300,
+        visible=False,
+        size=13,
+    )
 
     def intentar_login(e):
         usuario = db.validar_credenciales(cuenta_input.value, nip_input.value)
         if usuario:
             error_msg.visible = False
-            page.snack_bar = ft.SnackBar(ft.Text(f"Acceso Concedido: {usuario[1]}"))
-            page.snack_bar.open = True
-            page.update()
+            sesion = {
+                "id": usuario[0],
+                "nombre": usuario[1],
+                "saldo": usuario[2],
+                "num_cuenta": cuenta_input.value,
+            }
+            al_ingresar(sesion)
         else:
             error_msg.visible = True
             page.update()
 
-    # --- ENSAMBLADO FINAL ---
-    fondo_principal = ft.Container(
-        expand=True,
-        image=ft.DecorationImage(
-            src="1.jpg",
-            fit="cover",
-            opacity=0.4
-        ),
+    tarjeta = ft.Container(
+        width=420,
+        bgcolor=ft.Colors.with_opacity(0.25, ft.Colors.BLACK),
+        border_radius=24,
+        border=ft.Border.all(1, ft.Colors.with_opacity(0.4, ft.Colors.WHITE)),
+        padding=ft.Padding.only(left=40, right=40, top=45, bottom=45),
         content=ft.Column([
-            # Espaciado superior para centrar el formulario
+            ft.Container(
+                content=ft.Icon(ft.Icons.ACCOUNT_BALANCE, size=48, color=ft.Colors.WHITE),
+                alignment=ft.Alignment(0, 0),
+            ),
+            ft.Container(height=8),
+            ft.Text(
+                "BANCO",
+                size=14,
+                color=ft.Colors.WHITE70,
+                text_align=ft.TextAlign.CENTER,
+                weight=ft.FontWeight.W_600,
+            ),
             ft.Container(height=20),
-
-            aplicar_sombra_perimetral(cuenta_input),
-            ft.Container(height=15),
-            aplicar_sombra_perimetral(nip_input),
-
-            error_msg,
+            ft.Text(
+                "Bienvenido",
+                size=26,
+                color=ft.Colors.WHITE,
+                text_align=ft.TextAlign.CENTER,
+                weight=ft.FontWeight.BOLD,
+            ),
             ft.Container(height=25),
-
-            # Botón Ingresar
-            aplicar_sombra_perimetral(
-                ft.FilledButton(
-                    content=ft.Container(
-                        content=ft.Row([
-                            ft.Text("Ingresar", size=22, color=ft.Colors.WHITE),
-                            ft.Icon(ft.Icons.LOGIN, size=35, color=ft.Colors.WHITE),
-                        ], alignment=ft.MainAxisAlignment.CENTER, spacing=20),
-                        alignment=ft.Alignment(0, 0)
+            ft.Text("Número de Cuenta", color=ft.Colors.WHITE70, size=13),
+            ft.Container(height=5),
+            cuenta_input,
+            ft.Container(height=15),
+            ft.Text("NIP", color=ft.Colors.WHITE70, size=13),
+            ft.Container(height=5),
+            nip_input,
+            ft.Container(height=5),
+            error_msg,
+            ft.Container(height=20),
+            ft.Container(
+                content=ft.Button(
+                    content=ft.Text("Ingresar", size=18, color=ft.Colors.WHITE,
+                    weight=ft.FontWeight.BOLD),
+                    width=340,
+                    height=52,
+                    style=ft.ButtonStyle(
+                        bgcolor=ft.Colors.with_opacity(0.55, ft.Colors.BLUE_GREY_900),
+                        shape=ft.RoundedRectangleBorder(radius=12),
+                        overlay_color=ft.Colors.with_opacity(0.1, ft.Colors.WHITE),
                     ),
-                    height=80,
-                    width=400,
-                    style=estilo_comun,
-                    on_click=intentar_login
-                )
-            )
-        ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER),
+                    on_click=intentar_login,
+                ),
+                alignment=ft.Alignment(0, 0),
+            ),
+        ], horizontal_alignment=ft.CrossAxisAlignment.STRETCH, spacing=0),
     )
 
-    page.add(fondo_principal)
-    page.update()
+    return ft.Container(
+        expand=True,
+        content=ft.Column(
+            [tarjeta],
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        ),
+    )
 
 
 if __name__ == "__main__":
     db.inicializar_db()
-    ft.run(login_screen, assets_dir="../imagenes")
+
+    ANCHO_APP = 1200
+    ALTO_APP = 1020
+
+    def test(page: ft.Page):
+        page.window.maximized = True
+        page.window.full_screen = True
+        page.bgcolor = ft.Colors.BLACK
+        page.theme_mode = ft.ThemeMode.DARK
+        page.padding = 0
+
+        page.add(
+            ft.Container(
+                expand=True,
+                bgcolor=ft.Colors.BLACK,
+                alignment=ft.Alignment(0, 0),
+                content=ft.Container(
+                    width=ANCHO_APP,
+                    height=ALTO_APP,
+                    clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
+                    image=ft.DecorationImage(src="1.jpg", fit="cover", opacity=0.4),
+                    content=obtener_vista_login(page, al_ingresar=lambda sesion: None),
+                ),
+            )
+        )
+
+    ft.app(target=test, assets_dir="../imagenes")
