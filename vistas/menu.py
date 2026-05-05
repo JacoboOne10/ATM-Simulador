@@ -1,6 +1,7 @@
 import flet as ft
 import database as db
 from datetime import datetime
+import asyncio
 
 
 def obtener_vista_menu(page: ft.Page, sesion: dict, al_salir):
@@ -13,7 +14,11 @@ def obtener_vista_menu(page: ft.Page, sesion: dict, al_salir):
         text_align=ft.TextAlign.CENTER,
     )
 
-    ahora = datetime.now().strftime("%d/%m/%Y  %H:%M")
+    hora_texto = ft.Text(
+        datetime.now().strftime("%d/%m/%Y  %H:%M"),
+        color=ft.Colors.WHITE54,
+        size=15,
+    )
 
     def boton_menu(texto, icono, on_click):
         return ft.Container(
@@ -77,7 +82,7 @@ def obtener_vista_menu(page: ft.Page, sesion: dict, al_salir):
                             weight=ft.FontWeight.BOLD),
                 ], spacing=12),
                 ft.Column([
-                    ft.Text(ahora, color=ft.Colors.WHITE54, size=15),
+                    hora_texto,
                     ft.Text(sesion["nombre"], color=ft.Colors.WHITE70, size=16),
                 ], horizontal_alignment=ft.CrossAxisAlignment.END, spacing=4),
             ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
@@ -115,6 +120,15 @@ def obtener_vista_menu(page: ft.Page, sesion: dict, al_salir):
     )
 
     contenido = ft.Container(content=vista_menu, expand=True)
+
+    async def actualizar_hora():
+        while True:
+            hora_texto.value = datetime.now().strftime("%d/%m/%Y  %H:%M")
+            page.update()
+            await asyncio.sleep(30)
+
+    page.run_task(actualizar_hora)
+
     return contenido
 
 
@@ -125,7 +139,6 @@ if __name__ == "__main__":
     def test(page: ft.Page):
         db.inicializar_db()
         page.window.maximized = True
-        page.window.full_screen = True
         page.bgcolor = ft.Colors.BLACK
         page.theme_mode = ft.ThemeMode.DARK
         page.padding = 0

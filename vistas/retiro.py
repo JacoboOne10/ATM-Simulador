@@ -149,7 +149,6 @@ if __name__ == "__main__":
 
     def test(page: ft.Page):
         page.window.maximized = True
-        page.window.full_screen = True
         page.bgcolor = ft.Colors.BLACK
         page.theme_mode = ft.ThemeMode.DARK
         page.padding = 0
