@@ -2,7 +2,9 @@ import sqlite3
 from datetime import datetime
 import os
 
+
 DB_NAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ATM.db")
+
 
 def obtener_conexion():
     return sqlite3.connect(DB_NAME)
@@ -94,7 +96,7 @@ def realizar_transferencia(origen_id, destino_id, monto, num_cuenta_origen, num_
 
     cursor.execute('''INSERT INTO transacciones (usuario_id, tipo, monto, concepto, cuenta_destino, fecha_hora)
                       VALUES (?, ?, ?, ?, ?, ?)''',
-                   (destino_id, "Depósito", monto, "Transferencia recibida", num_cuenta_origen, fecha))
+                   (destino_id, "Transferencia", monto, "Transferencia recibida", num_cuenta_origen, fecha))
 
     conn.commit()
     conn.close()
@@ -120,6 +122,13 @@ def obtener_total_transacciones(usuario_id):
     total = cursor.fetchone()[0]
     conn.close()
     return total
+
+def cambiar_nip(usuario_id, nuevo_nip):
+    conn = obtener_conexion()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE usuarios SET pin = ? WHERE id = ?", (nuevo_nip, usuario_id))
+    conn.commit()
+    conn.close()
 
 
 if __name__ == "__main__":

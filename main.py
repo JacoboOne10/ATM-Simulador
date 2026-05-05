@@ -3,6 +3,7 @@ from database import inicializar_db
 from vistas.login import obtener_vista_login
 from vistas.menu import obtener_vista_menu
 
+
 ANCHO_APP = 1200
 ALTO_APP = 1020
 
@@ -10,6 +11,7 @@ ALTO_APP = 1020
 def main(page: ft.Page):
     inicializar_db()
     page.window.maximized = True
+    page.title = "Simulador ATM"
     page.bgcolor = ft.Colors.BLACK
     page.theme_mode = ft.ThemeMode.DARK
     page.padding = 0
