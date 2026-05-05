@@ -10,7 +10,6 @@ ALTO_APP = 1020
 def main(page: ft.Page):
     inicializar_db()
     page.window.maximized = True
-    page.window.full_screen = True
     page.bgcolor = ft.Colors.BLACK
     page.theme_mode = ft.ThemeMode.DARK
     page.padding = 0

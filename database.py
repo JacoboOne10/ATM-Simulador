@@ -71,6 +71,57 @@ def obtener_saldo(usuario_id):
     conn.close()
     return resultado[0] if resultado else 0.0
 
+def buscar_usuario_por_cuenta(num_cuenta):
+    conn = obtener_conexion()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nombre, num_cuenta FROM usuarios WHERE num_cuenta = ?", (num_cuenta,))
+    usuario = cursor.fetchone()
+    conn.close()
+    return usuario  # (id, nombre, num_cuenta) o None
+
+def realizar_transferencia(origen_id, destino_id, monto, num_cuenta_origen, num_cuenta_destino):
+    conn = obtener_conexion()
+    cursor = conn.cursor()
+    from datetime import datetime
+    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    cursor.execute("UPDATE usuarios SET saldo = saldo - ? WHERE id = ?", (monto, origen_id))
+    cursor.execute("UPDATE usuarios SET saldo = saldo + ? WHERE id = ?", (monto, destino_id))
+
+    cursor.execute('''INSERT INTO transacciones (usuario_id, tipo, monto, concepto, cuenta_destino, fecha_hora)
+                      VALUES (?, ?, ?, ?, ?, ?)''',
+                   (origen_id, "Transferencia", monto, "Transferencia enviada", num_cuenta_destino, fecha))
+
+    cursor.execute('''INSERT INTO transacciones (usuario_id, tipo, monto, concepto, cuenta_destino, fecha_hora)
+                      VALUES (?, ?, ?, ?, ?, ?)''',
+                   (destino_id, "Depósito", monto, "Transferencia recibida", num_cuenta_origen, fecha))
+
+    conn.commit()
+    conn.close()
+
+def obtener_transacciones(usuario_id, limite=5):
+    conn = obtener_conexion()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT tipo, monto, concepto, cuenta_destino, fecha_hora
+        FROM transacciones
+        WHERE usuario_id = ?
+        ORDER BY fecha_hora DESC
+        LIMIT ?
+    ''', (usuario_id, limite))
+    resultado = cursor.fetchall()
+    conn.close()
+    return resultado
+
+def obtener_total_transacciones(usuario_id):
+    conn = obtener_conexion()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM transacciones WHERE usuario_id = ?", (usuario_id,))
+    total = cursor.fetchone()[0]
+    conn.close()
+    return total
+
+
 if __name__ == "__main__":
     inicializar_db()
     print("Tablas creadas correctamente.")
