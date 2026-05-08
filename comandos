@@ -1,5 +1,6 @@
 # Borrar datos sin borrar tablas
 py -c "import sqlite3; conn = sqlite3.connect('ATM.db'); conn.execute('DELETE FROM transacciones'); conn.execute('DELETE FROM usuarios'); conn.commit(); conn.close(); print('Datos borrados')"
 
+
 # Correr el seeder
 py seeder.py
